@@ -11,6 +11,7 @@ use regex::Regex;
 //      - class is indicated by special type
 //      - function is defined by round braces
 //      - rest should be variables
+
 fn split_keep<'a>(r: &Vec<&str>, text: &'a str) -> Vec<&'a str> {
     let mut result = Vec::new();
     let mut last = 0;
@@ -29,27 +30,63 @@ fn split_keep<'a>(r: &Vec<&str>, text: &'a str) -> Vec<&'a str> {
     result
 }
 
-fn main() {
-    let contents = fs::read_to_string("test.cpp").expect("Read string failed");
+struct Class {
+    m_type: String,
+    m_name: String,
+    m_block: String,
+}
 
-    let class_regex = Regex::new(r"(\S*) (\S*).*\{([\s\S]*)\}").unwrap();
+impl Class {
+    pub fn new(text: &str) -> Self {
+        let regex = Regex::new(r"(\S*) (\S*).*\{([\s\S]*)\}").unwrap();
 
-    let class_capture = class_regex.captures(&contents).expect("Regex failed.");
+        let capture = regex
+            .captures(&text)
+            .expect("Regex for parsing class failed.");
 
-    let (re_type, re_name, re_block) = (
-        &class_capture[1].trim(),
-        &class_capture[2].trim(),
-        &class_capture[3],
-    );
-
-    println!("Type: {} Name: {} Block: {}", &re_type, &re_name, &re_block);
-
-    if re_type == &"class" {
-        let visibility_capture =
-            split_keep(&["public:", "protected:", "private:"].to_vec(), re_block);
-
-        for find in visibility_capture {
-            println!("{find}");
+        Self {
+            m_type: capture[1].trim().to_string(),
+            m_name: capture[2].trim().to_string(),
+            m_block: capture[3].to_string(),
         }
     }
+
+    pub fn print(self: &Self) {
+        println!(
+            "Type:\t{}\nName:\t{}\nBlock: {}",
+            &self.m_type, &self.m_name, &self.m_block
+        );
+    }
+
+    pub fn to_puml(self: &Self) -> String {
+        let mut puml_diagram = vec!["@startuml"];
+
+        let puml_class = format!("{} {} {{\n", self.m_type, self.m_name).to_owned();
+        puml_diagram.push(&puml_class);
+        puml_diagram.push("}\n@enduml");
+        puml_diagram.join("\n").to_string()
+    }
+}
+
+fn main() {
+    let file_contents = fs::read_to_string("test.cpp").expect("Read string failed");
+
+    if file_contents.contains("class") {
+        let parsed_class: Class = Class::new(&file_contents);
+
+        parsed_class.print();
+
+        let puml = parsed_class.to_puml();
+        println!("{}", puml);
+        fs::write("test.puml", puml).expect("Write failed.");
+    }
+
+    // if re_type == &"class" {
+    //     let visibility_capture =
+    //         split_keep(&["public:", "protected:", "private:"].to_vec(), re_block);
+
+    //     for find in visibility_capture {
+    //         println!("{find}");
+    //     }
+    // }
 }
