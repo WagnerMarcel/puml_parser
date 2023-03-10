@@ -1,6 +1,4 @@
-use std::fs;
-
-use regex::Regex;
+use clang::*;
 
 // Final design should look something like this:
 // 1. Split file into (nested) blocks.
@@ -12,81 +10,77 @@ use regex::Regex;
 //      - function is defined by round braces
 //      - rest should be variables
 
-fn split_keep<'a>(r: &Vec<&str>, text: &'a str) -> Vec<&'a str> {
-    let mut result = Vec::new();
-    let mut last = 0;
-    for pat in r {
-        for (index, matched) in text.match_indices(pat) {
-            if last != index {
-                result.push(&text[last..index]);
-            }
-            result.push(matched);
-            last = index + matched.len();
-        }
-    }
-    if last < text.len() {
-        result.push(&text[last..]);
-    }
-    result
-}
-
-struct Class {
-    m_type: String,
-    m_name: String,
-    m_block: String,
-}
-
-impl Class {
-    pub fn new(text: &str) -> Self {
-        let regex = Regex::new(r"(\S*) (\S*).*\{([\s\S]*)\}").unwrap();
-
-        let capture = regex
-            .captures(&text)
-            .expect("Regex for parsing class failed.");
-
-        Self {
-            m_type: capture[1].trim().to_string(),
-            m_name: capture[2].trim().to_string(),
-            m_block: capture[3].to_string(),
-        }
-    }
-
-    pub fn print(self: &Self) {
-        println!(
-            "Type:\t{}\nName:\t{}\nBlock: {}",
-            &self.m_type, &self.m_name, &self.m_block
-        );
-    }
-
-    pub fn to_puml(self: &Self) -> String {
-        let mut puml_diagram = vec!["@startuml"];
-
-        let puml_class = format!("{} {} {{\n", self.m_type, self.m_name).to_owned();
-        puml_diagram.push(&puml_class);
-        puml_diagram.push("}\n@enduml");
-        puml_diagram.join("\n").to_string()
-    }
-}
-
 fn main() {
-    let file_contents = fs::read_to_string("test.cpp").expect("Read string failed");
+    // Acquire an instance of `Clang`
+    let clang = Clang::new().unwrap();
 
-    if file_contents.contains("class") {
-        let parsed_class: Class = Class::new(&file_contents);
+    // Create a new `Index`
+    let index = Index::new(&clang, false, true);
 
-        parsed_class.print();
+    // Parse a source file into a translation unit
+    let tu = index
+        .parser("test.cpp")
+        .arguments(&["-std=c++11"])
+        .parse()
+        .unwrap();
 
-        let puml = parsed_class.to_puml();
-        println!("{}", puml);
-        fs::write("test.puml", puml).expect("Write failed.");
+    let entities = tu.get_entity().get_children().into_iter();
+
+    for entity in entities {
+        println!("{:?}", entity.get_pretty_printer());
     }
 
-    // if re_type == &"class" {
-    //     let visibility_capture =
-    //         split_keep(&["public:", "protected:", "private:"].to_vec(), re_block);
+    // Get the structs in this translation unit
+    let structs = tu
+        .get_entity()
+        .get_children()
+        .into_iter()
+        .filter(|e| e.get_kind() == EntityKind::StructDecl)
+        .collect::<Vec<_>>();
 
-    //     for find in visibility_capture {
-    //         println!("{find}");
-    //     }
-    // }
+    let classes = tu
+        .get_entity()
+        .get_children()
+        .into_iter()
+        .filter(|e| e.get_kind() == EntityKind::ClassDecl)
+        .collect::<Vec<_>>();
+
+    // Print information about the structs
+    for struct_ in structs {
+        let type_ = struct_.get_type().unwrap();
+        let size = type_.get_sizeof().unwrap();
+        println!(
+            "struct: {:?} (size: {} bytes)",
+            struct_.get_name().unwrap(),
+            size
+        );
+
+        println!("Number of children: {}", struct_.get_children().len());
+
+        for field in struct_.get_children() {
+            let name = field.get_name().expect("Name failed");
+            let offset = type_.get_offsetof(&name).unwrap();
+            println!("    field: {:?} (offset: {} bits)", name, offset);
+        }
+
+        println!("{:?}", struct_.get_pretty_printer());
+    }
+
+    for class_ in classes {
+        let type_ = class_.get_type().unwrap();
+        let size = type_.get_sizeof().unwrap();
+        println!(
+            "class: {:?} (size: {} bytes)",
+            class_.get_name().unwrap(),
+            size
+        );
+
+        println!("Number of children: {}", class_.get_children().len());
+
+        for field in class_.get_children() {
+            println!("{:?}", field.get_pretty_printer());
+        }
+
+        println!("{:?}", class_.get_pretty_printer());
+    }
 }
