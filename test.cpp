@@ -40,7 +40,7 @@ private:
     float m_someVar{0.42F};
 };
 
-class F
-{
-    double a, b, c, d;
-};
+// class F
+// {
+//     double a, b, c, d;
+// };

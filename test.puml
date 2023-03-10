@@ -1,5 +1,15 @@
 @startuml
-class TestClass {
-
+class D {
+-a
+-b
+-c
+-d
+}
+class E {
++get()
++m_myInt
+#m_protectedInt
+-someFunc()
+-m_someVar
 }
 @enduml
