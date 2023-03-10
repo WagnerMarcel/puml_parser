@@ -12,6 +12,24 @@ use std::process::Command;
 //      - function is defined by round braces
 //      - rest should be variables
 
+macro_rules! log {
+    ($t:expr) => {
+        println!("\x1b[96mlog\x1b[0m: {}", $t)
+    };
+}
+
+macro_rules! warn {
+    ($t:expr) => {
+        println!("\x1b[93mwarning\x1b[0m: {}", $t)
+    };
+}
+
+macro_rules! warn_unimplemented {
+    ($t:expr) => {
+        println!("\x1b[94munimplemented\x1b[0m: {}", $t)
+    };
+}
+
 struct Diagram {
     file_contents: Vec<String>,
 }
@@ -40,8 +58,9 @@ impl Diagram {
         let entities = tu.get_entity().get_children().into_iter();
 
         for entity in entities {
-            if is_class(&entity) {
-                self.create_class(&entity);
+            match entity.get_kind() {
+                EntityKind::ClassDecl => self.create_class(&entity),
+                kind => warn_unimplemented!(format!("{:?}", kind)),
             }
         }
 
@@ -58,7 +77,7 @@ impl Diagram {
             match field.get_kind() {
                 EntityKind::FieldDecl => self.create_declaration(&field),
                 EntityKind::Method => self.create_method(&field),
-                kind => println!("{:?}", kind),
+                kind => warn_unimplemented!(format!("{:?}", kind)),
             }
         }
 
@@ -103,14 +122,10 @@ impl Diagram {
 
     pub fn write_to_file(self, f: &str) {
         match fs::write(f, self.file_contents.join("\n")) {
-            Ok(_) => println!("Save successful"),
+            Ok(_) => log!("Save successful"),
             Err(error) => println!("{}", error),
         }
     }
-}
-
-fn is_class(entity: &Entity) -> bool {
-    EntityKind::ClassDecl == entity.get_kind()
 }
 
 fn main() {
@@ -118,9 +133,9 @@ fn main() {
     diagram.create("test.cpp");
     diagram.write_to_file("test.puml");
 
-    // Command::new("sh")
-    //     .arg("-c")
-    //     .arg("plantuml -tsvg test.puml")
-    //     .output()
-    //     .expect("failed to execute");
+    Command::new("sh")
+        .arg("-c")
+        .arg("plantuml -tsvg test.puml")
+        .output()
+        .expect("failed to execute");
 }
