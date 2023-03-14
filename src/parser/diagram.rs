@@ -4,7 +4,7 @@ use std::fs;
 use super::super::utils::macros::*;
 
 pub struct Diagram {
-    file_contents: Vec<String>,
+    pub file_contents: Vec<String>,
 }
 
 impl Diagram {

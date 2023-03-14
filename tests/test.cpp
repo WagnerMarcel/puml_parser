@@ -1,7 +1,3 @@
-
-#ifndef _STRUCTS_H_
-#define _STRUCTS_H_
-
 struct A
 {
     int a, b, c, d;
@@ -22,8 +18,6 @@ class D
     double a, b, c, d;
 };
 
-#endif
-
 class E
 {
 public:
@@ -40,7 +34,7 @@ private:
     float m_someVar{0.42F};
 };
 
-// class F
-// {
-//     double a, b, c, d;
-// };
+class F
+{
+    double a, b, c, d;
+};

@@ -17,7 +17,7 @@ pub mod utils;
 
 fn main() {
     let mut diagram = Diagram::new();
-    diagram.create("test.cpp");
+    diagram.create("tests/test.cpp");
     diagram.write_to_file("test.puml");
 
     Command::new("sh")

@@ -12,4 +12,10 @@ class E {
 -someFunc()
 -m_someVar
 }
+class F {
+-a
+-b
+-c
+-d
+}
 @enduml
