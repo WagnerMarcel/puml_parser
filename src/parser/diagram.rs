@@ -7,6 +7,12 @@ pub struct Diagram {
     pub file_contents: Vec<String>,
 }
 
+impl Default for Diagram {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Diagram {
     pub fn new() -> Self {
         Self {
@@ -41,9 +47,8 @@ impl Diagram {
     }
 
     fn create_class(&mut self, class_entity: &Entity) {
-        match class_entity.get_name() {
-            Some(name) => self.file_contents.push(format!("class {} {{", name)),
-            None => {}
+        if let Some(name) = class_entity.get_name() {
+            self.file_contents.push(format!("class {} {{", name));
         }
 
         for field in class_entity.get_children() {
@@ -66,7 +71,7 @@ impl Diagram {
             )),
             None => self
                 .file_contents
-                .push(format!("{}", field_entity.get_name().unwrap_or_default())),
+                .push(field_entity.get_name().unwrap_or_default()),
         }
     }
 
@@ -86,10 +91,10 @@ impl Diagram {
 
     fn get_accessibility_character(entity: &Entity) -> Option<char> {
         match entity.get_accessibility() {
-            Some(Accessibility::Private) => return Some('-'),
-            Some(Accessibility::Protected) => return Some('#'),
-            Some(Accessibility::Public) => return Some('+'),
-            None => return None,
+            Some(Accessibility::Private) => Some('-'),
+            Some(Accessibility::Protected) => Some('#'),
+            Some(Accessibility::Public) => Some('+'),
+            None => None,
         }
     }
 
