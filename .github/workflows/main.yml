@@ -40,6 +40,9 @@ jobs:
           toolchain: stable
           override: true
       - uses: actions-rs/cargo@v1
+        env:
+            LIBCLANG_PATH: ${{ runner.temp }}/llvm-10.0/lib
+            LLVM_CONFIG_PATH: ${{ runner.temp }}/llvm-10.0/bin/llvm-config
         with:
           command: test
 
