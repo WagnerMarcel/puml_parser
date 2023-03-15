@@ -33,6 +33,8 @@ jobs:
       - name: Symlink libclang.so (Linux)
         run: sudo ln -s libclang-11.so.1 /lib/x86_64-linux-gnu/libclang.so
         working-directory: ${{ env.LLVM_PATH }}/lib
+      - name: Install libtinfo5
+        run: sudo apt install -y libtinfo5
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
