@@ -28,6 +28,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Cache LLVM and Clang
+        id: cache-llvm
+        uses: actions/cache@v2
+        with:
+          path: ${{ runner.temp }}/llvm-10.0
+          key: ubuntu-latest-llvm-10.0
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@v1
         with:
@@ -36,7 +42,6 @@ jobs:
           cached: ${{ steps.cache-llvm.outputs.cache-hit }}
       - uses: actions-rs/toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
           override: true
       - uses: actions-rs/cargo@v1
@@ -45,7 +50,6 @@ jobs:
             LLVM_CONFIG_PATH: ${{ runner.temp }}/llvm-10.0/bin/llvm-config
         with:
           command: test
-          args: --verbose --features clang_10_0
 
   fmt:
     name: Rustfmt
