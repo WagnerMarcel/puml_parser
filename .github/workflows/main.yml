@@ -12,7 +12,6 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1
         with:
           version: 10.0
-          directory: ${{ runner.temp }}/llvm
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
@@ -31,7 +30,6 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1
         with:
           version: 10.0
-          # directory: ${{ runner.temp }}/llvm
       - name: Symlink libclang.so (Linux)
         run: sudo ln -s libclang-11.so.1 /lib/x86_64-linux-gnu/libclang.so
         working-directory: ${{ env.LLVM_PATH }}/lib
@@ -41,8 +39,8 @@ jobs:
           override: true
       - uses: actions-rs/cargo@v1
         env:
-            LIBCLANG_PATH: ${{ runner.temp }}/llvm/lib
-            LLVM_CONFIG_PATH: ${{ runner.temp }}/llvm/bin/llvm-config
+            LIBCLANG_PATH: ${{ env.LLVM_PATH }}/lib
+            LLVM_CONFIG_PATH: ${{ env.LLVM_PATH }}/bin/llvm-config
         with:
           command: test
 
@@ -71,7 +69,6 @@ jobs:
         uses: KyleMayes/install-llvm-action@v1
         with:
           version: 10.0
-          directory: ${{ runner.temp }}/llvm
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
