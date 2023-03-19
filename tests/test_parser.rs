@@ -5,7 +5,7 @@ mod common;
 #[test]
 fn system_test() {
     let mut diagram = Diagram::new();
-    diagram.create("tests/test.cpp");
+    diagram.create("tests/test_class.cpp");
     assert_eq!(
         diagram.file_contents.join("\n"),
         common::get_expected_diagram()

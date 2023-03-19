@@ -2,6 +2,7 @@ use clang::*;
 use std::fs;
 
 use super::super::utils::macros::*;
+use super::element::*;
 
 pub struct Diagram {
     pub file_contents: Vec<String>,
@@ -16,32 +17,50 @@ impl Default for Diagram {
 impl Diagram {
     pub fn new() -> Self {
         Self {
-            file_contents: (vec!["@startuml".to_string()]),
+            file_contents: (vec![]),
         }
     }
 
-    pub fn create(&mut self, file: &str) {
+    pub fn create(&mut self, file: &str, theme: &str) {
+        self.file_contents.push("@startuml".to_string());
+        if !theme.is_empty() {
+            self.file_contents.push(format!("!theme {}", theme))
+        }
+
         // Acquire an instance of `Clang`
         let clang = Clang::new().unwrap();
 
         // Create a new `Index`
         let index = Index::new(&clang, false, true);
 
-        // Parse a source file into a translation unit
+        // Parse a source file into a translation unit using Cpp11
         let tu = index
             .parser(file)
             .arguments(&["-std=c++11"])
             .parse()
             .unwrap();
 
-        let entities = tu.get_entity().get_children().into_iter();
+        let entities = tu.get_entity().get_children();
+
+        let mut element_queue: Vec<Entity> = vec![];
 
         for entity in entities {
             match entity.get_kind() {
-                EntityKind::ClassDecl => self.create_class(&entity),
+                EntityKind::ClassDecl => {
+                    let _ = self.create_class(&entity);
+                }
                 kind => warn_unimplemented!(format!("{:?}", kind)),
             }
         }
+
+        // for entity in element_queue {
+        //     match entity.get_kind() {
+        //         EntityKind::ClassDecl => {
+        //             let _ = self.create_class(&entity);
+        //         }
+        //         kind => warn_unimplemented!(format!("{:?}", kind)),
+        //     }
+        // }
 
         self.file_contents.push("@enduml".to_string());
     }
@@ -51,23 +70,30 @@ impl Diagram {
             self.file_contents.push(format!("class {} {{", name));
         }
 
+        // let mut element_queue: Vec<Entity> = vec![];
+
         for field in class_entity.get_children() {
             match field.get_kind() {
                 EntityKind::FieldDecl => self.create_declaration(&field),
                 EntityKind::Method => self.create_method(&field),
+                // EntityKind::EnumDecl => element_queue.push(field),
                 kind => warn_unimplemented!(format!("{:?}", kind)),
             }
         }
 
         self.file_contents.push("}".to_string());
+
+        // return element_queue;
     }
 
     fn create_declaration(&mut self, field_entity: &Entity) {
+        println!("{:?}", field_entity.get_type().unwrap());
         match Diagram::get_accessibility_character(field_entity) {
             Some(accessibility) => self.file_contents.push(format!(
-                "{}{}",
+                "{}{} : {}",
                 accessibility,
-                field_entity.get_name().unwrap_or_default()
+                field_entity.get_name().unwrap_or_default(),
+                field_entity.get_type().unwrap().get_display_name()
             )),
             None => self
                 .file_contents
