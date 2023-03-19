@@ -3,11 +3,12 @@
 [![Continuous integration](https://github.com/WagnerMarcel/puml_parser/actions/workflows/main.yml/badge.svg)](https://github.com/WagnerMarcel/puml_parser/actions/workflows/main.yml)
 
 This is a small project with the intention to parse C++ files into Plant UML diagrams.
+
 The project is build in rust and utilizes the LLVM/Clang toolchain to parse the C++ files and genertes the respective Plant UML components from the parsed AST entities.
-The generated output can look something like:
+
+The generated output can look something like (from [`tests/test.cpp`](tests/test.cpp)):
 <!-- Side by side code / images -->
 <div align="center">
-    <iframe src="tests/test.cpp" frameborder="0" width="50%"></iframe>
     <img src="test.svg">
 </div>
 
