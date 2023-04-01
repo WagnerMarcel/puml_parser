@@ -1,14 +1,22 @@
 use puml_parser::parser::diagram::Diagram;
+use serial_test::serial;
 
 mod common;
 
 #[test]
-fn system_test() {
+#[serial]
+fn system_test_cpp() {
     let mut diagram = Diagram::new();
     let theme = "";
     diagram.create("tests/test_class.cpp", theme);
-    assert_eq!(
-        diagram.file_contents.join("\n"),
-        common::get_expected_diagram()
-    );
+    assert_eq!(diagram.get_diagram(), common::get_expected_diagram());
+}
+
+#[test]
+#[serial]
+fn system_test_hpp() {
+    let mut diagram = Diagram::new();
+    let theme = "";
+    diagram.create("tests/test_class.hpp", theme);
+    assert_eq!(diagram.get_diagram(), common::get_expected_diagram());
 }

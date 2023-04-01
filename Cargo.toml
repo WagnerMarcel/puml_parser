@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 clang = { version = "*", features = ["clang_10_0"] }
+serial_test = "2.0.0"

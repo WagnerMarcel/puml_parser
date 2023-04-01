@@ -4,7 +4,7 @@ use std::fs;
 use super::super::utils::macros::*;
 
 pub struct Diagram {
-    pub file_contents: Vec<String>,
+    file_contents: Vec<String>,
 }
 
 impl Default for Diagram {
@@ -18,6 +18,10 @@ impl Diagram {
         Self {
             file_contents: (vec![]),
         }
+    }
+
+    pub fn get_diagram(&self) -> String {
+        self.file_contents.join("\n")
     }
 
     pub fn create(&mut self, file: &str, theme: &str) {
@@ -108,7 +112,7 @@ impl Diagram {
     }
 
     pub fn write_to_file(self, f: &str) {
-        match fs::write(f, self.file_contents.join("\n")) {
+        match fs::write(f, self.get_diagram()) {
             Ok(_) => log!("Save successful"),
             Err(error) => println!("{}", error),
         }
