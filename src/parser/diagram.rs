@@ -2,7 +2,6 @@ use clang::*;
 use std::fs;
 
 use super::super::utils::macros::*;
-use super::element::*;
 
 pub struct Diagram {
     pub file_contents: Vec<String>,
@@ -42,25 +41,14 @@ impl Diagram {
 
         let entities = tu.get_entity().get_children();
 
-        let mut element_queue: Vec<Entity> = vec![];
-
         for entity in entities {
             match entity.get_kind() {
                 EntityKind::ClassDecl => {
-                    let _ = self.create_class(&entity);
+                    self.create_class(&entity);
                 }
                 kind => warn_unimplemented!(format!("{:?}", kind)),
             }
         }
-
-        // for entity in element_queue {
-        //     match entity.get_kind() {
-        //         EntityKind::ClassDecl => {
-        //             let _ = self.create_class(&entity);
-        //         }
-        //         kind => warn_unimplemented!(format!("{:?}", kind)),
-        //     }
-        // }
 
         self.file_contents.push("@enduml".to_string());
     }
@@ -70,20 +58,15 @@ impl Diagram {
             self.file_contents.push(format!("class {} {{", name));
         }
 
-        // let mut element_queue: Vec<Entity> = vec![];
-
         for field in class_entity.get_children() {
             match field.get_kind() {
                 EntityKind::FieldDecl => self.create_declaration(&field),
                 EntityKind::Method => self.create_method(&field),
-                // EntityKind::EnumDecl => element_queue.push(field),
                 kind => warn_unimplemented!(format!("{:?}", kind)),
             }
         }
 
         self.file_contents.push("}".to_string());
-
-        // return element_queue;
     }
 
     fn create_declaration(&mut self, field_entity: &Entity) {

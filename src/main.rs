@@ -31,7 +31,7 @@ fn main() {
     }
 
     let mut diagram = Diagram::new();
-    diagram.create(&file, &theme);
+    diagram.create(file, theme);
     diagram.write_to_file(&save_path);
 
     Command::new("sh")

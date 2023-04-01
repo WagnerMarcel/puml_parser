@@ -1,4 +1,16 @@
 pub fn get_expected_diagram() -> String {
-    "@startuml\nclass E {\n+get()\n+m_myInt\n#m_protectedInt\n-someFunc()\n-m_someVar\n}\n@enduml"
-        .to_string()
+    [
+        "@startuml",
+        "class TestClass {",
+        "+m_enumValue : TestClass::TestEnum",
+        "+get()",
+        "+m_myInt : unsigned int",
+        "#m_structValue : TestClass::TestStruct",
+        "#m_protectedInt : int",
+        "-someFunc()",
+        "-m_someVar : float",
+        "}",
+        "@enduml",
+    ]
+    .join("\n")
 }
