@@ -9,6 +9,8 @@ class TestClass {
 -m_someVar : float
 }
 enum TestEnum {
+One
+Two
 }
 TestClass o-- TestEnum
 struct TestStruct {

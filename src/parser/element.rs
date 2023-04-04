@@ -91,18 +91,18 @@ impl Element {
         if self.kind.is_label() {
             vec.push(format!("{} {} {{", self.kind.value(), self.name));
             for child in &self.children {
-                if Kind::FieldDecl == child.kind {
-                    match child.visibility {
-                        Some(visibility) => {
-                            vec.push(format!("{}{} : {}", visibility, child.name, child.type_))
-                        }
-                        None => vec.push(format!("{} : {}", child.name, child.type_)),
+                let visibility = match child.visibility {
+                    Some(visibility) => visibility.to_string(),
+                    None => String::new(),
+                };
+
+                match child.kind {
+                    Kind::FieldDecl => {
+                        vec.push(format!("{}{} : {}", visibility, child.name, child.type_))
                     }
-                } else if Kind::Method == child.kind {
-                    match child.visibility {
-                        Some(visibility) => vec.push(format!("{}{}()", visibility, child.name)),
-                        None => vec.push(format!("{}()", child.name)),
-                    }
+                    Kind::Method => vec.push(format!("{}{}()", visibility, child.name)),
+                    Kind::EnumConstantDecl => vec.push(format!("{}", child.name)),
+                    _ => {}
                 }
             }
             vec.push("}".to_string());

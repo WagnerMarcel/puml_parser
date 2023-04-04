@@ -11,6 +11,8 @@ pub fn get_expected_diagram() -> String {
         "-m_someVar : float",
         "}",
         "enum TestEnum {",
+        "One",
+        "Two",
         "}",
         "TestClass o-- TestEnum",
         "struct TestStruct {",
