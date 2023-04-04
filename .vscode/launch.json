@@ -3,5 +3,23 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": []
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Cargo launch debug",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=puml_parser",
+                    "--package=puml_parser"
+                ],
+                "filter": {
+                    "name": "puml_parser",
+                    "kind": "bin"
+                }
+            },
+            "args": ["tests/test_namespace.hpp"]
+        }
+    ]
 }

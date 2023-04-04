@@ -10,6 +10,10 @@ pub fn get_expected_diagram() -> String {
         "-someFunc()",
         "-m_someVar : float",
         "}",
+        "struct TestStruct {",
+        "+one : int",
+        "}",
+        "TestClass o-- TestStruct",
         "@enduml",
     ]
     .join("\n")
