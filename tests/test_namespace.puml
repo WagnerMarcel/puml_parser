@@ -8,6 +8,9 @@ class TestClass {
 -someFunc()
 -m_someVar : float
 }
+enum TestEnum {
+}
+TestClass o-- TestEnum
 struct TestStruct {
 +one : int
 }

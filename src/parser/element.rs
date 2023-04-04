@@ -1,11 +1,13 @@
 use clang::*;
 
+use super::kind::*;
+
 use super::super::utils::macros::*;
 
 #[derive(Default)]
 pub struct Element {
     name: String,
-    kind: String,
+    kind: Kind,
     type_: String,
     visibility: Option<char>,
     children: Vec<Element>,
@@ -28,7 +30,7 @@ impl Element {
             let mut element = Element::default();
             element.create(child);
 
-            if element.kind == "field" || element.kind == "method" {
+            if element.kind.is_value() {
                 self.children.push(element);
             } else if !element.kind.is_empty() {
                 self.aggregations.push(element);
@@ -38,15 +40,17 @@ impl Element {
         }
     }
 
-    fn map_kind(kind: EntityKind) -> String {
+    fn map_kind(kind: EntityKind) -> Kind {
         match kind {
-            EntityKind::ClassDecl => "class".to_string(),
-            EntityKind::StructDecl => "struct".to_string(),
-            EntityKind::FieldDecl => "field".to_string(),
-            EntityKind::Method => "method".to_string(),
+            EntityKind::ClassDecl => Kind::Label(String::from("class")),
+            EntityKind::StructDecl => Kind::Label(String::from("struct")),
+            EntityKind::EnumDecl => Kind::Label(String::from("enum")),
+            EntityKind::FieldDecl => Kind::FieldDecl,
+            EntityKind::Method => Kind::Method,
+            EntityKind::EnumConstantDecl => Kind::EnumConstantDecl,
             kind => {
                 warn_unimplemented!(format!("{:?}", kind));
-                String::new()
+                Kind::None
             }
         }
     }
@@ -84,17 +88,17 @@ impl Element {
     fn get_element(&self) -> Vec<String> {
         let mut vec: Vec<String> = vec![];
 
-        if !self.kind.is_empty() {
-            vec.push(format!("{} {} {{", self.kind, self.name));
+        if self.kind.is_label() {
+            vec.push(format!("{} {} {{", self.kind.value(), self.name));
             for child in &self.children {
-                if child.kind == "field" {
+                if Kind::FieldDecl == child.kind {
                     match child.visibility {
                         Some(visibility) => {
                             vec.push(format!("{}{} : {}", visibility, child.name, child.type_))
                         }
                         None => vec.push(format!("{} : {}", child.name, child.type_)),
                     }
-                } else if child.kind == "method" {
+                } else if Kind::Method == child.kind {
                     match child.visibility {
                         Some(visibility) => vec.push(format!("{}{}()", visibility, child.name)),
                         None => vec.push(format!("{}()", child.name)),
