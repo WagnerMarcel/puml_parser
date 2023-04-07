@@ -7,6 +7,7 @@ pub enum Kind {
     FieldDecl,
     Method,
     EnumConstantDecl,
+    BaseSpecifier,
 }
 
 impl Kind {
@@ -19,7 +20,15 @@ impl Kind {
     }
 
     pub fn is_value(&self) -> bool {
-        !self.is_empty() && !self.is_label() && !matches!(self, Self::Namespace)
+        !self.is_empty() && !self.is_label() && !self.is_namespace() && !self.is_base()
+    }
+
+    pub fn is_namespace(&self) -> bool {
+        matches!(self, Self::Namespace)
+    }
+
+    pub fn is_base(&self) -> bool {
+        matches!(self, Self::BaseSpecifier)
     }
 
     pub fn value(&self) -> String {

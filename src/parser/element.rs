@@ -11,7 +11,7 @@ pub struct Element {
     type_: String,
     visibility: Option<char>,
     children: Vec<Element>,
-    // extensions: Vec<Element>,
+    extensions: Vec<Element>,
     // compositions: Vec<Element>,
     aggregations: Vec<Element>,
 }
@@ -22,13 +22,19 @@ impl Element {
         self.kind = Self::map_kind(entity.get_kind());
         self.visibility = Self::get_accessibility_character(entity.get_accessibility());
         self.type_ = match entity.get_type() {
-            Some(type_) => type_
-                .get_display_name()
-                .split("::")
-                .collect::<Vec<&str>>()
-                .last()
-                .unwrap_or(&&"")
-                .to_string(),
+            Some(type_) => {
+                if !self.kind.is_base() {
+                    type_
+                        .get_display_name()
+                        .split("::")
+                        .collect::<Vec<&str>>()
+                        .last()
+                        .unwrap_or(&"")
+                        .to_string()
+                } else {
+                    type_.get_display_name().replace("::", ".")
+                }
+            }
             None => String::new(),
         };
 
@@ -38,6 +44,8 @@ impl Element {
 
             if element.kind.is_value() {
                 self.children.push(element);
+            } else if element.kind.is_base() {
+                self.extensions.push(element);
             } else if !element.kind.is_empty() {
                 self.aggregations.push(element);
             } else {
@@ -55,6 +63,7 @@ impl Element {
             EntityKind::FieldDecl => Kind::FieldDecl,
             EntityKind::Method => Kind::Method,
             EntityKind::EnumConstantDecl => Kind::EnumConstantDecl,
+            EntityKind::BaseSpecifier => Kind::BaseSpecifier,
             kind => {
                 warn_unimplemented!(format!("{:?}", kind));
                 Kind::None
@@ -86,6 +95,12 @@ impl Element {
 
             if !self.type_.is_empty() && !aggregate.type_.is_empty() {
                 vec.push(format!("{} o-- {}", self.name, aggregate.name))
+            }
+        }
+
+        for extension in &self.extensions {
+            if !self.type_.is_empty() && !extension.type_.is_empty() {
+                vec.push(format!("{} <|-- {}", self.name, extension.type_))
             }
         }
 
