@@ -22,7 +22,13 @@ impl Element {
         self.kind = Self::map_kind(entity.get_kind());
         self.visibility = Self::get_accessibility_character(entity.get_accessibility());
         self.type_ = match entity.get_type() {
-            Some(type_) => type_.get_display_name(),
+            Some(type_) => type_
+                .get_display_name()
+                .split("::")
+                .collect::<Vec<&str>>()
+                .last()
+                .unwrap_or(&&"")
+                .to_string(),
             None => String::new(),
         };
 

@@ -3,10 +3,10 @@ hide empty members
 namespace OuterNamespace {
 namespace TestNamespace {
 class TestClass {
-+m_enumValue : OuterNamespace::TestNamespace::TestClass::TestEnum
++m_enumValue : TestEnum
 +get()
 +m_myInt : unsigned int
-#m_structValue : OuterNamespace::TestNamespace::TestClass::TestStruct
+#m_structValue : TestStruct
 #m_protectedInt : int
 -someFunc()
 -m_someVar : float
