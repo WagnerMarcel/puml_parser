@@ -1,6 +1,7 @@
 pub fn get_expected_diagram() -> String {
     [
         "@startuml",
+        "hide empty members",
         "class TestClass {",
         "+m_enumValue : TestClass::TestEnum",
         "+get()",
@@ -15,7 +16,7 @@ pub fn get_expected_diagram() -> String {
         "Two",
         "}",
         "TestClass o-- TestEnum",
-        "struct TestStruct {",
+        "class TestStruct {",
         "+one : int",
         "}",
         "TestClass o-- TestStruct",

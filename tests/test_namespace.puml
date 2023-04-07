@@ -1,9 +1,12 @@
 @startuml
+hide empty members
+namespace OuterNamespace {
+namespace TestNamespace {
 class TestClass {
-+m_enumValue : TestNamespace::TestClass::TestEnum
++m_enumValue : OuterNamespace::TestNamespace::TestClass::TestEnum
 +get()
 +m_myInt : unsigned int
-#m_structValue : TestNamespace::TestClass::TestStruct
+#m_structValue : OuterNamespace::TestNamespace::TestClass::TestStruct
 #m_protectedInt : int
 -someFunc()
 -m_someVar : float
@@ -13,8 +16,10 @@ One
 Two
 }
 TestClass o-- TestEnum
-struct TestStruct {
+class TestStruct {
 +one : int
 }
 TestClass o-- TestStruct
+}
+}
 @enduml

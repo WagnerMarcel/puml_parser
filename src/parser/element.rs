@@ -43,8 +43,9 @@ impl Element {
     fn map_kind(kind: EntityKind) -> Kind {
         match kind {
             EntityKind::ClassDecl => Kind::Label(String::from("class")),
-            EntityKind::StructDecl => Kind::Label(String::from("struct")),
+            EntityKind::StructDecl => Kind::Label(String::from("class")),
             EntityKind::EnumDecl => Kind::Label(String::from("enum")),
+            EntityKind::Namespace => Kind::Namespace,
             EntityKind::FieldDecl => Kind::FieldDecl,
             EntityKind::Method => Kind::Method,
             EntityKind::EnumConstantDecl => Kind::EnumConstantDecl,
@@ -69,7 +70,7 @@ impl Element {
     pub fn get(&self) -> Vec<String> {
         let mut vec: Vec<String> = vec![];
 
-        let mut own = self.get_element();
+        let (mut own, mut end) = self.get_element();
         vec.append(&mut own);
 
         for aggregate in &self.aggregations {
@@ -82,11 +83,14 @@ impl Element {
             }
         }
 
+        vec.append(&mut end);
+
         vec
     }
 
-    fn get_element(&self) -> Vec<String> {
+    fn get_element(&self) -> (Vec<String>, Vec<String>) {
         let mut vec: Vec<String> = vec![];
+        let mut end: Vec<String> = vec![];
 
         if self.kind.is_label() {
             vec.push(format!("{} {} {{", self.kind.value(), self.name));
@@ -101,13 +105,16 @@ impl Element {
                         vec.push(format!("{}{} : {}", visibility, child.name, child.type_))
                     }
                     Kind::Method => vec.push(format!("{}{}()", visibility, child.name)),
-                    Kind::EnumConstantDecl => vec.push(format!("{}", child.name)),
+                    Kind::EnumConstantDecl => vec.push(child.name.to_string()),
                     _ => {}
                 }
             }
-            vec.push("}".to_string());
+            vec.push(String::from("}"));
+        } else if self.kind == Kind::Namespace {
+            vec.push(format!("namespace {} {{", self.name));
+            end.push(String::from("}"))
         }
 
-        vec
+        (vec, end)
     }
 }

@@ -27,10 +27,12 @@ impl Diagram {
     }
 
     pub fn create(&mut self, file: &str, theme: &str) {
-        self.file_contents.push("@startuml".to_string());
+        self.file_contents.push(String::from("@startuml"));
         if !theme.is_empty() {
             self.file_contents.push(format!("!theme {}", theme))
         }
+
+        self.file_contents.push(String::from("hide empty members"));
 
         // Acquire an instance of `Clang`
         let clang = Clang::new().unwrap();
@@ -54,7 +56,7 @@ impl Diagram {
             self.file_contents.append(&mut vec);
         }
 
-        self.file_contents.push("@enduml".to_string());
+        self.file_contents.push(String::from("@enduml"));
     }
 
     pub fn write_to_file(self, f: &str) {

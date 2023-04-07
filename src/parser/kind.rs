@@ -1,8 +1,9 @@
-#[derive(Default, PartialEq)]
+#[derive(Default, PartialEq, Debug)]
 pub enum Kind {
     #[default]
     None,
     Label(String),
+    Namespace,
     FieldDecl,
     Method,
     EnumConstantDecl,
@@ -18,7 +19,7 @@ impl Kind {
     }
 
     pub fn is_value(&self) -> bool {
-        !self.is_empty() && !self.is_label()
+        !self.is_empty() && !self.is_label() && !matches!(self, Self::Namespace)
     }
 
     pub fn value(&self) -> String {
