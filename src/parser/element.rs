@@ -14,6 +14,7 @@ pub struct Element {
     extensions: Vec<Element>,
     // compositions: Vec<Element>,
     aggregations: Vec<Element>,
+    dependencies: Vec<String>,
 }
 
 impl Element {
@@ -21,22 +22,7 @@ impl Element {
         self.name = entity.get_name().unwrap_or("".to_string());
         self.kind = Self::map_kind(entity.get_kind());
         self.visibility = Self::get_accessibility_character(entity.get_accessibility());
-        self.type_ = match entity.get_type() {
-            Some(type_) => {
-                if !self.kind.is_base() {
-                    type_
-                        .get_display_name()
-                        .split("::")
-                        .collect::<Vec<&str>>()
-                        .last()
-                        .unwrap_or(&"")
-                        .to_string()
-                } else {
-                    type_.get_display_name().replace("::", ".")
-                }
-            }
-            None => String::new(),
-        };
+        self.type_ = Self::extract_type(entity, self.kind.is_base());
 
         for child in entity.get_children() {
             let mut element = Element::default();
@@ -51,6 +37,39 @@ impl Element {
             } else {
                 // Skip
             }
+
+            if child.get_arguments().is_some() {
+                let arguments = child.get_arguments().unwrap();
+                for argument in arguments {
+                    self.dependencies.push(
+                        Self::extract_type(argument, false)
+                            .trim_end_matches('&')
+                            .trim()
+                            .to_string(),
+                    )
+                }
+                self.dependencies.sort();
+                self.dependencies.dedup();
+            }
+        }
+    }
+
+    fn extract_type(entity: Entity, is_base: bool) -> String {
+        match entity.get_type() {
+            Some(type_) => {
+                if !is_base {
+                    type_
+                        .get_display_name()
+                        .split("::")
+                        .collect::<Vec<&str>>()
+                        .last()
+                        .unwrap_or(&"")
+                        .to_string()
+                } else {
+                    type_.get_display_name().replace("::", ".")
+                }
+            }
+            None => String::new(),
         }
     }
 
@@ -101,6 +120,12 @@ impl Element {
         for extension in &self.extensions {
             if !self.type_.is_empty() && !extension.type_.is_empty() {
                 vec.push(format!("{} <|-- {}", self.name, extension.type_))
+            }
+        }
+
+        for dependency in &self.dependencies {
+            if !self.type_.is_empty() && !dependency.is_empty() {
+                vec.push(format!("{} .. {}", self.name, dependency))
             }
         }
 

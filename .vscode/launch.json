@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["tests/test_inheritance.hpp"]
+            "args": ["tests/test_arguments.hpp"]
         }
     ]
 }
