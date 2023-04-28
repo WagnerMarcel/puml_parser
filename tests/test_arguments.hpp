@@ -6,6 +6,8 @@ struct TestInterface
 class TestClass
 {
 public:
+    void func(UnknownInterface &testUnknown) {}
+
     enum class TestEnum
     {
         One,
@@ -27,7 +29,7 @@ protected:
     int m_protectedInt = -33;
 
 private:
-    int someFunc(TestInterface &testStruct) {}
+    int someFunc(const TestInterface &testStruct) {}
 
     float m_someVar{0.42F};
 };
