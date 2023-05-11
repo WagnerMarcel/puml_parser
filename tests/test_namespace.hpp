@@ -1,32 +1,37 @@
-namespace TestNamespace
+
+namespace OuterNamespace
 {
-    class TestClass
+    namespace TestNamespace
     {
-    public:
-        enum class TestEnum
+        class TestClass
         {
-            One,
-            Two
+        public:
+            enum class TestEnum
+            {
+                One,
+                Two
+            };
+            TestEnum m_enumValue;
+
+            void get() {}
+
+            unsigned int m_myInt;
+
+        protected:
+            struct TestStruct
+            {
+                int one{1};
+            };
+            TestStruct m_structValue;
+
+            int m_protectedInt = -33;
+
+        private:
+            int someFunc() {}
+
+            float m_someVar{0.42F};
         };
-        TestEnum m_enumValue;
 
-        void get() {}
+    } // namespace TestNamespace
 
-        unsigned int m_myInt;
-
-    protected:
-        struct TestStruct
-        {
-            int one{1};
-        };
-        TestStruct m_structValue;
-
-        int m_protectedInt = -33;
-
-    private:
-        int someFunc() {}
-
-        float m_someVar{0.42F};
-    };
-
-} // namespace TestNamespace
+} // namepsace OuterNamespace

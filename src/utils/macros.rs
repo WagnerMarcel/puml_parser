@@ -7,8 +7,8 @@ macro_rules! log {
 pub(crate) use log;
 
 macro_rules! warn_ {
-    ($t:expr) => {
-        println!("\x1b[93mwarning\x1b[0m: {}", $t)
+    ($w:expr, $t:expr) => {
+        println!("\x1b[93mwarning {}\x1b[0m: {}", $w, $t)
     };
 }
 pub(crate) use warn_;

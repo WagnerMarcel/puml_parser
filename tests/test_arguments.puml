@@ -1,8 +1,12 @@
 @startuml
 hide empty members
-namespace OuterNamespace {
-namespace TestNamespace {
+class UnknownInterface {
+}
+class TestInterface {
++m_someMember : int
+}
 class TestClass {
++func()
 +m_enumValue : TestEnum
 +get()
 +m_myInt : unsigned int
@@ -20,6 +24,6 @@ class TestStruct {
 +one : int
 }
 TestClass o-- TestStruct
-}
-}
+TestClass .. TestInterface
+TestClass .. UnknownInterface
 @enduml

@@ -19,7 +19,7 @@
                     "kind": "bin"
                 }
             },
-            "args": ["tests/test_namespace.hpp"]
+            "args": ["tests/test_arguments.hpp"]
         }
     ]
 }

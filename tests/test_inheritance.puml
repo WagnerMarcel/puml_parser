@@ -1,0 +1,25 @@
+@startuml
+hide empty members
+namespace OtherNamespace {
+class OtherParent {
+-m_test : float
+-m_nest : NestedInParent
+}
+class NestedInParent {
++m_pub : float
+}
+OtherParent o-- NestedInParent
+}
+namespace TestNamespace {
+class ParentClass {
+-m_priv : int
+#m_prot : float
++m_pub : unsigned int
+}
+class TestClass {
++m_pub : int
+}
+TestClass <|-- TestNamespace.ParentClass
+TestClass <|-- OtherNamespace.OtherParent
+}
+@enduml
