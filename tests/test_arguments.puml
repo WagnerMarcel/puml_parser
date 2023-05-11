@@ -26,5 +26,4 @@ class TestStruct {
 TestClass o-- TestStruct
 TestClass .. TestInterface
 TestClass .. UnknownInterface
-TestClass .. const TestInterface
 @enduml

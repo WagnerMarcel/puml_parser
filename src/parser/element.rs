@@ -43,6 +43,7 @@ impl Element {
                 for argument in arguments {
                     self.dependencies.push(
                         Self::extract_type(argument, false)
+                            .trim_start_matches("const")
                             .trim_end_matches('&')
                             .trim()
                             .to_string(),
