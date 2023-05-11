@@ -1,9 +1,12 @@
 @startuml
 hide empty members
+class UnknownInterface {
+}
 class TestInterface {
 +m_someMember : int
 }
 class TestClass {
++func()
 +m_enumValue : TestEnum
 +get()
 +m_myInt : unsigned int
@@ -22,4 +25,6 @@ class TestStruct {
 }
 TestClass o-- TestStruct
 TestClass .. TestInterface
+TestClass .. UnknownInterface
+TestClass .. const TestInterface
 @enduml
